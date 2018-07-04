@@ -55,12 +55,12 @@ class Worker():
 		msf.pickle_dump(train_x, "test.pkl")
 		pass
 
-	def convert_json():
+	def convert_json(self):
 		num_cores = multiprocessing.cpu_count()
 		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data)
 		return images
 
-	def create_image(elem):
+	def create_image(self,elem):
 		print(elem['imageId'])
 		response = requests.get(elem['url'])
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
