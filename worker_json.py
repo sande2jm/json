@@ -28,6 +28,7 @@ class Worker():
 		self.s3 = boto3.resource('s3')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
+		#self.file_out = self.direc + "/" + self.my_id[-4:] +"_output.txt"
 		self.results = "Results of worker " + self.my_id
 		self.data = None
 		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
@@ -49,8 +50,8 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		# print(self.params)
-		# print(self.data.keys)
+		print(self.params)
+		print(self.data.keys)
 		#self.convert_json()
 
 		pass
@@ -68,9 +69,9 @@ class Worker():
 		"""
 		Use the file_out to write the results of this worker to s3.
 		"""
-		with open(self.file_out, 'w') as outfile:
-			json.dump(self.results, outfile)
-		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
+		# with open(self.file_out, 'w') as outfile:
+		# 	json.dump(self.results, outfile)
+		# self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
 		
 
 
