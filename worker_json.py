@@ -28,7 +28,7 @@ class Worker():
 		self.s3 = boto3.resource('s3')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
-		#self.file_out = self.direc + "/" + self.my_id[-4:] +"_output.txt"
+		self.file_out = "data" + "_" + pos + ".pkl"
 		self.results = "Results of worker " + self.my_id
 		self.data = None
 		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
@@ -50,18 +50,19 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		print(self.params)
-		test = self.convert_json()
-		msf.pickle_dump(test, "test.pkl")
-		pass
+		# print(self.params)
+		pos = self.params['index']
+		transformed_data = self.convert_json()
+		msf.pickle_dump(transformed_data, self.file_out)
+		
 
 	def convert_json(self):
 		num_cores = multiprocessing.cpu_count()
-		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'])
+		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:10])
 		return images
 
 	def create_image(self,elem):
-		print(elem['imageId'])
+		#print(elem['imageId'])
 		response = requests.get(elem['url'])
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
@@ -70,9 +71,7 @@ class Worker():
 		"""
 		Use the file_out to write the results of this worker to s3.
 		"""
-		# with open(self.file_out, 'w') as outfile:
-		# 	json.dump(self.results, outfile)
-		# self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
+		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
 		
 
 
