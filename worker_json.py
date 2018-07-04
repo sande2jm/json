@@ -28,7 +28,7 @@ class Worker():
 		self.s3 = boto3.resource('s3')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
-		self.file_out = "data" + "_" + pos + ".pkl"
+		self.file_out = None
 		self.results = "Results of worker " + self.my_id
 		self.data = None
 		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
@@ -43,6 +43,8 @@ class Worker():
 		self.params = swarm_params[self.my_id]
 		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
 		self.data = mpu.io.read('data.json')
+		pos = self.params['index']
+		self.file_out = "data" + "_" + pos + ".pkl"
 
 
 	def run(self):
@@ -51,7 +53,6 @@ class Worker():
 		on them. Set self.results in this method based on self.params
 		"""
 		# print(self.params)
-		pos = self.params['index']
 		transformed_data = self.convert_json()
 		msf.pickle_dump(transformed_data, self.file_out)
 		
