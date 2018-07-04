@@ -17,9 +17,8 @@ class Worker():
 		self.direc = get_parent()
 		self.params = {}
 		self.s3 = boto3.resource('s3')
-		# self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
-		# self.my_id = "".join(map(chr, self.my_id))
-		self.my_id = 'i-0583fd331291fecb4'
+		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
+		self.my_id = "".join(map(chr, self.my_id))
 		self.results = "Results of worker " + self.my_id
 		# self.s3.Bucket('swarm-instructions').download_file('instructions.txt', self.file_in)
 		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
