@@ -5,6 +5,15 @@ from subprocess import call
 from subprocess import check_output
 from helper import *
 import mpu.io
+from joblib import Parallel, delayed
+import multiprocessing
+from PIL import Image
+import pickle
+import MacOSFile as msf
+import numpy as np
+import mpu.io
+import requests
+from io import BytesIO
 
 class Worker():
 
@@ -32,6 +41,7 @@ class Worker():
 			swarm_params = json.load(f)
 		self.params = swarm_params[self.my_id]
 		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
+		self.data
 
 
 	def run(self):
@@ -40,8 +50,17 @@ class Worker():
 		on them. Set self.results in this method based on self.params
 		"""
 		print(self.params)
+		# self.convert_json()
 
 		pass
+
+	def conert_json():
+		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in data['images'][:200000])
+
+	def create_image(elem):
+		print(elem['imageId'])
+		response = requests.get(elem['url'])
+		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
 
 	def report(self):
