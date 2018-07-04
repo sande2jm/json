@@ -63,7 +63,7 @@ class Worker():
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
 		results = []
-		for x in self.data['images'][:500]:
+		for x in self.data['images'][:1000]:
 			results.append(self.create_image(x))
 		return results
 
