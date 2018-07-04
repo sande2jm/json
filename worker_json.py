@@ -49,8 +49,8 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		print(self.params)
-		print(self.data.keys)
+		# print(self.params)
+		# print(self.data.keys)
 		#self.convert_json()
 
 		pass
