@@ -44,7 +44,7 @@ class Worker():
 		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
 		self.data = mpu.io.read('data.json')
 		pos = self.params['index']
-		self.file_out = "data" + "_" + pos + ".pkl"
+		self.file_out = "data" + "_" + str(pos) + ".pkl"
 
 
 	def run(self):
