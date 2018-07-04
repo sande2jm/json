@@ -59,7 +59,7 @@ class Worker():
 
 	def convert_json(self):
 		num_cores = multiprocessing.cpu_count()
-		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:10])
+		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'])
 		return images
 
 	def create_image(self,elem):
