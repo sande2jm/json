@@ -62,14 +62,17 @@ class Worker():
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
 		results = []
-		for x in self.data['images'][:100]:
+		for x in self.data['images'][:200]:
 			results.append(self.create_image(x))
 		return results
 
 	def create_image(self,elem):
-		print(elem)
+		#print(elem)
 		print(elem['imageId'])
-		response = requests.get(elem['url'])
+		try:
+			response = requests.get(elem['url'])
+		except:
+			raise Exception "request failed"
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
 
