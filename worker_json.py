@@ -39,7 +39,8 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		print("Doing work on files")
+		print(self.params)
+
 		pass
 
 
