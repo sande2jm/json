@@ -69,7 +69,7 @@ class Worker():
 
 	def create_image(self,elem):
 		#print(elem)
-		# print(elem['imageId'])
+		print(elem['imageId'])
 		try:
 			response = requests.get(elem['url'],timeout=2)
 		except:
