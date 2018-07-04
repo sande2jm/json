@@ -70,9 +70,9 @@ class Worker():
 		#print(elem)
 		print(elem['imageId'])
 		try:
-			response = requests.get(elem['url'])
+			response = requests.get(elem['url'],timeout=2)
 		except:
-			raise Exception "request failed"
+			return "Failed"
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
 
