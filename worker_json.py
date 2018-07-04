@@ -51,8 +51,9 @@ class Worker():
 		on them. Set self.results in this method based on self.params
 		"""
 		print(self.params)
+		print(self.data[0])
 		test = self.convert_json()
-		msf.pickle_dump(train_x, "test.pkl")
+		msf.pickle_dump(test, "test.pkl")
 		pass
 
 	def convert_json(self):
