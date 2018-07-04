@@ -29,7 +29,7 @@ class Worker():
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
 		self.results = "Results of worker " + self.my_id
-		# self.s3.Bucket('swarm-instructions').download_file('instructions.txt', self.file_in)
+		self.data = None
 		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
 
 	def extract(self):
@@ -41,7 +41,7 @@ class Worker():
 			swarm_params = json.load(f)
 		self.params = swarm_params[self.my_id]
 		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
-		self.data mpu.io.read('data.json')
+		self.data = mpu.io.read('data.json')
 
 
 	def run(self):
