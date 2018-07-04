@@ -40,9 +40,6 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		# # data = mpu.io.read('data.json')
-		# # print(data)
-		# print(self.params)
 		print("Doing work on files")
 		pass
 
@@ -51,9 +48,9 @@ class Worker():
 		"""
 		Use the file_out to write the results of this worker to s3.
 		"""
-		# with open(self.file_out, 'w') as outfile:
-		# 	json.dump(self.results, outfile)
-		# self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
+		with open(self.file_out, 'w') as outfile:
+			json.dump(self.results, outfile)
+		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
 		
 
 
