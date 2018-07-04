@@ -63,7 +63,8 @@ class Worker():
 		return images
 
 	def create_image(self,elem):
-		#print(elem['imageId'])
+		print(elem)
+		print(elem['imageId'])
 		response = requests.get(elem['url'])
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
