@@ -51,13 +51,14 @@ class Worker():
 		on them. Set self.results in this method based on self.params
 		"""
 		print(self.params)
-		print(self.data.keys)
-		#self.convert_json()
-
+		test = self.convert_json()
+		msf.pickle_dump(train_x, "test.pkl")
 		pass
 
-	def conert_json():
-		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:200000])
+	def convert_json():
+		num_cores = multiprocessing.cpu_count()
+		images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data)
+		return images
 
 	def create_image(elem):
 		print(elem['imageId'])
