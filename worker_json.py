@@ -28,6 +28,7 @@ class Worker():
 		self.s3 = boto3.resource('s3')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
+		# self.my_id = 'i-0097e1fa8c756c590'
 		self.file_out = None
 		self.results = "Results of worker " + self.my_id
 		self.data = None
@@ -58,7 +59,7 @@ class Worker():
 		
 
 	def convert_json(self):
-		print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
+		# print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
 		results = []
@@ -68,7 +69,7 @@ class Worker():
 
 	def create_image(self,elem):
 		#print(elem)
-		print(elem['imageId'])
+		# print(elem['imageId'])
 		try:
 			response = requests.get(elem['url'],timeout=2)
 		except:
