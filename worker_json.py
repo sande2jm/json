@@ -64,7 +64,7 @@ class Worker():
 		# print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
-		dummy = []
+		dummy = self.data['images'][:]
 		results = []
 		num_cores = multiprocessing.cpu_count()
 		print(num_cores)
@@ -105,7 +105,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 
