@@ -25,9 +25,9 @@ class Worker():
 		"""
 		self.direc = get_parent()
 		self.params = {}
-		self.s3 = boto3.resource('s3')
-		sqs = boto3.resource('sqs',region_name='us-east-1')
-		self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
+		#self.s3 = boto3.resource('s3')
+		#sqs = boto3.resource('sqs',region_name='us-east-1')
+		#self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
 		# self.my_id = 'i-0097e1fa8c756c590'
@@ -93,7 +93,7 @@ class Worker():
 		'message': 'working',
 		'id': self.my_id,
 		'progress': round(i/size,4)}
-		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		#response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 	def dump(self):
@@ -105,7 +105,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		#response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 
