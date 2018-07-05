@@ -1,4 +1,5 @@
 from subprocess import call
+from subprocess import check_output
 import time
 import boto3
 import json
@@ -9,7 +10,7 @@ sqs = boto3.resource('sqs',region_name='us-east-1')
 # Create the queue. This returns an SQS.Queue instance
 queue = sqs.get_queue_by_name(QueueName='test')
 my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
-my_id = "".join(map(chr, self.my_id))
+my_id = "".join(map(chr, my_id))
 
 d = {
 'message': 'launched',
