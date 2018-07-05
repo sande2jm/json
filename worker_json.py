@@ -65,10 +65,15 @@ class Worker():
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
 		results = []
-		# results = [self.create_image(x) for x in self.data['images']]
-		for i,x in enumerate(self.data['images']):
-			if i %100 == 0:self.report(i)
-			results.append(self.create_image(x))
+		num_cores = multiprocessing.cpu_count()
+		print(num_cores)
+		if num_cores > 1:
+			results = Parallel(n_jobs=num_cores)(delayed(create_image)(i) for i in self.data['images'])
+		else:
+			# results = [self.create_image(x) for x in self.data['images']]
+			for i,x in enumerate(self.data['images']):
+				if i %100 == 0:self.report(i)
+				results.append(self.create_image(x))
 		return results
 
 	def create_image(self,elem):
