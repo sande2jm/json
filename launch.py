@@ -5,7 +5,7 @@ import json
 from worker_json import Worker
 import sys
 
-sqs = boto3.resource('sqs')
+sqs = boto3.resource('sqs',region_name='us-east-1')
 # Create the queue. This returns an SQS.Queue instance
 queue = sqs.get_queue_by_name(QueueName='test')
 my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
