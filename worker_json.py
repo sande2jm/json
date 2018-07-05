@@ -34,7 +34,7 @@ class Worker():
 		self.file_out = None
 		self.results = "Results of worker " + self.my_id
 		self.data = None
-		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
+		self.s3.Bucket('swarm-instructions').download_file('parameters.txt', 'parameters.txt')
 
 	def extract(self):
 		"""
