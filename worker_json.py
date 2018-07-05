@@ -27,7 +27,7 @@ class Worker():
 		self.params = {}
 		self.s3 = boto3.resource('s3')
 		sqs = boto3.resource('sqs',region_name='us-east-1')
-		self.queue = sqs.get_queue_by_name(QueueName='test')
+		self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
 		# self.my_id = 'i-0097e1fa8c756c590'
@@ -67,7 +67,7 @@ class Worker():
 		results = []
 		# results = [self.create_image(x) for x in self.data['images']]
 		for i,x in enumerate(self.data['images']):
-			if i %10 == 0:self.report(i)
+			if i %100 == 0:self.report(i)
 			results.append(self.create_image(x))
 		return results
 
@@ -86,7 +86,7 @@ class Worker():
 		'message': 'working',
 		'id': self.my_id,
 		'progress': round(i/size,4)}
-		response = self.queue.send_message(MessageBody=json.dumps(d))
+		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 	def dump(self):
@@ -98,7 +98,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = queue.send_message(MessageBody=json.dumps(d))
+		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 

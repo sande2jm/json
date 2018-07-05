@@ -8,7 +8,7 @@ import sys
 
 sqs = boto3.resource('sqs',region_name='us-east-1')
 # Create the queue. This returns an SQS.Queue instance
-queue = sqs.get_queue_by_name(QueueName='test')
+queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 my_id = "".join(map(chr, my_id))
 
@@ -17,7 +17,7 @@ d = {
 'id': my_id,
 'progress': 'None'}
 
-response = queue.send_message(MessageBody=json.dumps(d))
+response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 w = Worker()
 w.extract()
