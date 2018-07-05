@@ -82,7 +82,7 @@ class Worker():
 	def report(self,i):
 		size = len(self.data['images'])
 		d = {
-		'message': 'working',
+		'message': 'complete',
 		'id': self.my_id,
 		'progress': round(i/size,4)}
 		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
