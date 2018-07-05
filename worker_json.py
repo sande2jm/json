@@ -64,7 +64,7 @@ class Worker():
 		
 		# results = [self.create_image(x) for x in self.data['images']]
 		results = []
-		for i,x in enumerate(self.data['images']):
+		for i,x in enumerate(self.data['images'][:300]):
 			if i %100 == 0:
 				self.report(i)
 			results.append(self.create_image(x))
@@ -82,7 +82,7 @@ class Worker():
 	def report(self,i):
 		size = len(self.data['images'])
 		d = {
-		'message': 'complete',
+		'message': 'working',
 		'id': self.my_id,
 		'progress': round(i/size,4)}
 		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
