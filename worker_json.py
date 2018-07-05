@@ -98,7 +98,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-				response = queue.send_message(MessageBody=json.dumps(d))
+		response = queue.send_message(MessageBody=json.dumps(d))
 
 
 
