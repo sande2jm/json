@@ -26,6 +26,8 @@ class Worker():
 		self.direc = get_parent()
 		self.params = {}
 		self.s3 = boto3.resource('s3')
+		sqs = boto3.resource('sqs',region_name='us-east-1')
+		self.queue = sqs.get_queue_by_name(QueueName='test')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
 		# self.my_id = 'i-0097e1fa8c756c590'
@@ -63,7 +65,9 @@ class Worker():
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
 		results = []
-		for x in self.data['images']:
+		# results = [self.create_image(x) for x in self.data['images']]
+		for i,x in enumerate(self.data['images']):
+			if i %10 == 0:self.report(i)
 			results.append(self.create_image(x))
 		return results
 
@@ -76,13 +80,25 @@ class Worker():
 			return "Failed"
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
+	def report(self,i):
+		size = len(self.data['images'])
+		d = {
+		'message': 'working',
+		'id': self.my_id,
+		'progress': round(i/size,4)}
+		response = self.queue.send_message(MessageBody=json.dumps(d))
 
-	def report(self):
+
+	def dump(self):
 		"""
 		Use the file_out to write the results of this worker to s3.
 		"""
 		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
-		
+		d = {
+		'message': 'complete',
+		'id': self.my_id,
+		'progress': 'None'}
+				response = queue.send_message(MessageBody=json.dumps(d))
 
 
 

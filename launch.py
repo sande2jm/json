@@ -19,8 +19,8 @@ d = {
 
 response = queue.send_message(MessageBody=json.dumps(d))
 
-# w = Worker()
-# w.extract()
-# w.run()
-# w.report()
+w = Worker()
+w.extract()
+w.run()
+w.dump()
 
