@@ -64,12 +64,13 @@ class Worker():
 		# print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
+		dummy = []
 		results = []
 		num_cores = multiprocessing.cpu_count()
 		print(num_cores)
 		print(type(self.data['images']))
 		if num_cores > 1:
-			results = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'])
+			results = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in dummy)
 		else:
 			# results = [self.create_image(x) for x in self.data['images']]
 			for i,x in enumerate(self.data['images']):
