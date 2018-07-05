@@ -34,7 +34,7 @@ class Worker():
 		self.file_out = None
 		self.results = "Results of worker " + self.my_id
 		self.data = None
-		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
+		#self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
 
 	def extract(self):
 		"""
@@ -44,7 +44,7 @@ class Worker():
 		with open('instructions.txt', 'r') as f:
 			swarm_params = json.load(f)
 		self.params = swarm_params[self.my_id]
-		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
+		#self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
 		self.data = mpu.io.read('data.json')
 		pos = self.params['index']
 		self.file_out = "data" + "_" + str(pos) + ".pkl"
@@ -64,11 +64,11 @@ class Worker():
 		# print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
 		#num_cores = multiprocessing.cpu_count()
 		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
-		dummy = []
+		dummy = [0,0,0,0,0,0,0]
 		results = []
 		num_cores = multiprocessing.cpu_count()
 		print(num_cores)
-		print(type(self.data['images'][0]))
+		print(type(self.data['images']))
 		if num_cores > 1:
 			results = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in dummy)
 		else:
@@ -105,7 +105,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 
