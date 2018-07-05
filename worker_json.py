@@ -92,12 +92,12 @@ class Worker():
 		"""
 		Use the file_out to write the results of this worker to s3.
 		"""
-		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
 		d = {
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
 
 
 
