@@ -25,16 +25,16 @@ class Worker():
 		"""
 		self.direc = get_parent()
 		self.params = {}
-		self.s3 = boto3.resource('s3')
-		sqs = boto3.resource('sqs',region_name='us-east-1')
-		self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
+		#self.s3 = boto3.resource('s3')
+		#sqs = boto3.resource('sqs',region_name='us-east-1')
+		#self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
 		# self.my_id = 'i-0097e1fa8c756c590'
 		self.file_out = None
 		self.results = "Results of worker " + self.my_id
 		self.data = None
-		self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
+		#self.s3.Bucket('swarm-instructions').download_file('instructions.txt', 'instructions.txt')
 
 	def extract(self):
 		"""
@@ -44,7 +44,7 @@ class Worker():
 		with open('instructions.txt', 'r') as f:
 			swarm_params = json.load(f)
 		self.params = swarm_params[self.my_id]
-		self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
+		#self.s3.Bucket('swarm-instructions').download_file('data/' + self.params['images'], 'data.json')
 		self.data = mpu.io.read('data.json')
 		pos = self.params['index']
 		self.file_out = "data" + "_" + str(pos) + ".pkl"
@@ -61,11 +61,21 @@ class Worker():
 		
 
 	def convert_json(self):
-		
-		# results = [self.create_image(x) for x in self.data['images']]
-		for i,x in enumerate(self.data['images']):
-			if i %100 == 0:self.report(i)
-			results.append(self.create_image(x))
+		# print(type(self.data['images']),self.data['images'][0], self.data['images'][0]['url'])
+		#num_cores = multiprocessing.cpu_count()
+		# images = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'][:100])
+		dummy = [0,0,0,0,0,0,0]
+		results = []
+		num_cores = multiprocessing.cpu_count()
+		print(num_cores)
+		print(type(self.data['images']))
+		if num_cores > 1:
+			results = Parallel(n_jobs=num_cores)(delayed(self.create_image)(i) for i in self.data['images'])
+		else:
+			# results = [self.create_image(x) for x in self.data['images']]
+			for i,x in enumerate(self.data['images']):
+				if i %100 == 0:self.report(i)
+				results.append(self.create_image(x))
 		return results
 
 	def create_image(self,elem):
@@ -83,7 +93,7 @@ class Worker():
 		'message': 'working',
 		'id': self.my_id,
 		'progress': round(i/size,4)}
-		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		#response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 	def dump(self):
@@ -95,7 +105,7 @@ class Worker():
 		'message': 'complete',
 		'id': self.my_id,
 		'progress': 'None'}
-		response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+		#response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
 
 
 
