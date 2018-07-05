@@ -63,6 +63,7 @@ class Worker():
 	def convert_json(self):
 		
 		# results = [self.create_image(x) for x in self.data['images']]
+		results = []
 		for i,x in enumerate(self.data['images']):
 			if i %100 == 0:self.report(i)
 			results.append(self.create_image(x))
