@@ -70,6 +70,7 @@ class Worker():
 		results = []
 		i = 0
 		while i < size and self.state[0] != 'exit':
+			x = self.data['images'][i]
 			if i%100 == 0:
 				self.report(i, size=size)
 			results.append(self.create_image(x))
