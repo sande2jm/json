@@ -3,7 +3,7 @@ from subprocess import check_output
 import time
 import boto3
 import json
-from worker_json import Worker
+from worker import Worker
 import sys
 
 sqs = boto3.resource('sqs',region_name='us-east-1')
