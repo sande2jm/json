@@ -11,13 +11,14 @@ sqs = boto3.resource('sqs',region_name='us-east-1')
 queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 my_id = "".join(map(chr, my_id))
+group_id = 'json'
 
 d = {
 'message': 'launched',
 'id': my_id,
 'progress': 'None'}
 
-response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
+response = queue.send_message(MessageBody=json.dumps(d), MessageGroupId=group_id)
 
 w = Worker()
 w.extract()

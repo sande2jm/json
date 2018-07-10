@@ -25,7 +25,7 @@ class Worker():
 		self.queue = self.sqs.get_queue_by_name(QueueName='swarm.fifo')
 		self.controller_listener = Thread(target=self.check_in, daemon=True)
 		self.controller_listener.start()
-		self.group_id = 'json_bots'
+		self.group_id = 'json'
 		# self.s3.Bucket('swarm-instructions').download_file('instructions.txt', self.file_in)
 		# self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1', endpoint_url="http://localhost:8000")
 		# self.table = dynamodb.Table('swarm')
@@ -37,7 +37,7 @@ class Worker():
 
 	def check_in(self):
 		while True:
-			with open('worker/state.txt', 'r') as f:
+			with open(self.group_id +'/state.txt', 'r') as f:
 				self.state[0] = f.read()
 				time.sleep(3)
 
