@@ -4,16 +4,8 @@ import json
 from subprocess import call
 from subprocess import check_output
 from helper import *
-import mpu.io
-from joblib import Parallel, delayed
-import multiprocessing
-from PIL import Image
-import pickle
-import MacOSFile as msf
-import numpy as np
-import mpu.io
-import requests
-from io import BytesIO
+from threading import Thread
+import time
 
 class Worker():
 
@@ -26,20 +18,31 @@ class Worker():
 		self.direc = get_parent()
 		self.params = {}
 		self.s3 = boto3.resource('s3')
-		sqs = boto3.resource('sqs',region_name='us-east-1')
-		self.queue = sqs.get_queue_by_name(QueueName='swarm.fifo')
 		self.my_id = check_output(['curl', 'http://169.254.169.254/latest/meta-data/instance-id'])
 		self.my_id = "".join(map(chr, self.my_id))
-		# self.my_id = 'i-0097e1fa8c756c590'
+		self.sqs = boto3.resource('sqs', region_name='us-east-1')
+		self.state = ['waiting']
+		self.queue = self.sqs.get_queue_by_name(QueueName='swarm.fifo')
+		self.controller_listener = Thread(target=self.check_in, daemon=True)
+		self.controller_listener.start()
+		self.group_id = 'json_bots'
+		# self.s3.Bucket('swarm-instructions').download_file('instructions.txt', self.file_in)
+		# self.dynamodb = boto3.resource('dynamodb', region_name='us-east-1', endpoint_url="http://localhost:8000")
+		# self.table = dynamodb.Table('swarm')
+
+		"""JSON SPECIFIC VARIABLES"""
 		self.file_out = None
 		self.data = None
 		self.s3.Bucket('swarm-instructions').download_file('parameters.txt', 'parameters.txt')
 
+	def check_in(self):
+		while True:
+			with open('worker/state.txt', 'r') as f:
+				self.state[0] = f.read()
+				time.sleep(3)
+
 	def extract(self):
-		"""
-		Use the file_in from init to extract this workers specific parameters
-		from json dictionary based on ec2 instance ids
-		"""		
+		"""JSON SPECIFIC EXTRACT"""		
 		with open('parameters.txt', 'r') as f:
 			swarm_params = json.load(f)
 		self.params = swarm_params[self.my_id]
@@ -47,6 +50,7 @@ class Worker():
 		self.data = mpu.io.read('data.json')
 		pos = self.params['index']
 		self.file_out = "data" + "_" + str(pos) + ".pkl"
+		
 
 
 	def run(self):
@@ -54,20 +58,23 @@ class Worker():
 		Take the params from extract and run whatever operations you want
 		on them. Set self.results in this method based on self.params
 		"""
-		# print(self.params)
-		transformed_data = self.convert_json()
-		msf.pickle_dump(transformed_data, self.file_out)
-		
+		size = len(self.data['images'])
+		i = 0
+		while self.state[0] == 'waiting':
+			print("Waiting for GO") 
+			time.sleep(.3)
 
-	def convert_json(self):
-		
-		# results = [self.create_image(x) for x in self.data['images']]
 		results = []
-		for i,x in enumerate(self.data['images']):
-			if i %100 == 0:
-				self.report(i)
-			results.append(self.create_image(x))
-		return results
+		i = 0
+		while i < size and self.state[0] != 'exit':
+			if i%100 == 0:
+				self.report(i, size=size)
+			results.append(self.create_image(x))]
+			while self.state[0] == 'pause':
+				time.sleep(.3)
+				self.report(i,size=size)
+			i += 1
+		msf.pickle_dump(results, self.file_out)
 
 	def create_image(self,elem):
 		#print(elem)
@@ -78,14 +85,20 @@ class Worker():
 			return "Failed"
 		return np.array(Image.open(BytesIO(response.content)).convert('RGB').resize((64,64)))
 
-	def report(self,i):
-		size = len(self.data['images'])
+
+		
+
+
+	def report(self,i, size = 100):
+		"""
+		Post to swarm queue my progress and state
+		"""
 		d = {
 		'message': 'working',
+		'state': self.state[0],
 		'id': self.my_id,
 		'progress': round(i/size,4)}
-		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
-
+		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId=self.group_id)
 
 	def dump(self):
 		"""
@@ -93,10 +106,13 @@ class Worker():
 		"""
 		d = {
 		'message': 'complete',
+		'state': self.state[0],
 		'id': self.my_id,
 		'progress': 'None'}
-		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId='json_bots')
-		self.s3.meta.client.upload_file(self.file_out, 'swarm-results', self.file_out)
+		response = self.queue.send_message(MessageBody=json.dumps(d), MessageGroupId=self.group_id)
+
+
+		
 
 
 
